@@ -302,7 +302,7 @@ pub fn text(text: &str, format: &str) -> String{
     // bold
     let b_raw = &parts[2];
     let b_all: Vec<&str> = b_raw.split(':').collect();
-    let b = b_all[1];
+    let bold = b_all[1];
 
     // effect
     let eff_raw = &parts[3];
@@ -323,6 +323,19 @@ pub fn text(text: &str, format: &str) -> String{
         },
         &_ => {
             all_effects.push_str("");
+        }
+    }
+
+    match bold {
+        "1" => {
+            let e = format!("{}[1m", escape);
+            all_effects.push_str(&e);
+        },
+        "0" => {
+
+        },
+        &_ => {
+            panic!("bold must be 0 or 1")
         }
     }
 
