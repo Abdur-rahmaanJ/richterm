@@ -7,8 +7,7 @@ use richterm::print;
 
 fn main(){
 	let msg = &[
-		&text("richterm", "fg:violet bg:violet b:0 eff:blink"),
-		&text("\nwefwef", "")
+		&text("richterm", "fg:dark_blue bg:indian_red1 b:0 eff:blink"),
 		];
 	print(msg) 
 }

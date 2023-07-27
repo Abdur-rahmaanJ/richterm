@@ -309,17 +309,17 @@ pub fn text(text: &str, format: &str) -> String{
     let eff_all: Vec<&str> = eff_raw.split(':').collect();
     let eff = eff_all[1];
 
-    let fg_f = format!("{}[38;{}m", escape, fg);
-    println!("{}",fg_f);
+    let fg_f = format!("{}[38;5;{}m", escape, fg);
+    let bg_f = format!("{}[48;5;{}m", escape, bg);
 
     match eff {
         "i" => {
-            let bg_f = format!("{}[40;3;{}m", escape, bg);
-            all_effects.push_str(&bg_f);
+            let e = format!("{}[23m", escape);
+            all_effects.push_str(&e);
         },
         "blink" => {
-            let bg_f = format!("{}[40;5;{}m", escape, bg);
-            all_effects.push_str(&bg_f);
+            let e = format!("{}[5m", escape);
+            all_effects.push_str(&e);
         },
         &_ => {
             all_effects.push_str("");
@@ -327,6 +327,7 @@ pub fn text(text: &str, format: &str) -> String{
     }
 
     all_effects.push_str(&fg_f);
+    all_effects.push_str(&bg_f);
     // sall_effects.push_str(&bg_f);
 
     format!("{}{}{}", all_effects, text, end_seq)
