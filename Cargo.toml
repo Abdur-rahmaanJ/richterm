@@ -1,0 +1,17 @@
+[package]
+name = "richterm"
+version = "0.1.0"
+edition = "2023"
+description = "rich terminal, follow's python's famous rich library"
+keywords = ["cli", "terminal", "colors", "console", "ansi", "rich"]
+authors = ["Abdur-Rahmaan Janhangeer <arj.python@gmail.com>"]
+license = "MIT"
+homepage = "https://github.com/Abdur-RahmaanJ/richterm"
+repository = "https://github.com/Abdur-RahmaanJ/richterm"
+documentation = "https://docs.rs/richterm"
+readme = "README.md"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "richterm"
+path = "src/lib.rs"

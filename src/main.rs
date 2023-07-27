@@ -1,7 +1,3 @@
-# richterm
-
-
-```rust
 use richterm::text;
 use richterm::print;
 
@@ -12,4 +8,3 @@ fn main(){
 		];
 	print(msg) 
 }
-```
