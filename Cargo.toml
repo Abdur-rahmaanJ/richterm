@@ -15,3 +15,5 @@ readme = "README.md"
 [lib]
 name = "richterm"
 path = "src/lib.rs"
+
+[dependencies]
