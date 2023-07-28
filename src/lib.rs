@@ -318,6 +318,10 @@ pub fn text(text: &str, format: &str) -> String{
                         let e = format!("{}[1m", escape);
                         all_effects.push_str(&e);
                     },
+                    "s" => {
+                        let e = format!("{}[9m", escape);
+                        all_effects.push_str(&e);
+                    },
                     &_ => {
                         all_effects.push_str("");
                     }
