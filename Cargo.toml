@@ -1,6 +1,6 @@
 [package]
 name = "richterm"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 description = "rich terminal, follow's python's famous rich library"
 keywords = ["cli", "terminal", "colors", "console", "ansi"]
