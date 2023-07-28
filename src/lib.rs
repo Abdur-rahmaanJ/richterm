@@ -291,13 +291,29 @@ pub fn text(text: &str, format: &str) -> String{
         let val = part_all[1]; // ex red
 
         if command == "fg"{ 
-            let fg_code = ANSI_CODES.get(&val).expect("Cannot find color name").to_string();
-            let fg_formatted = format!("{}[38;5;{}m", escape, fg_code);
-            all_effects.push_str(&fg_formatted);
+            if val.starts_with("rgb("){
+                let trimmed_start = val.trim_start_matches("rgb(");
+                let trimmed_end = trimmed_start.trim_end_matches(")");
+                let rgb: Vec<&str> = trimmed_end.split(',').collect();
+                let rgb_formatted = format!("{}[38;2;{};{};{}m", escape, rgb[0], rgb[1], rgb[2]);
+                all_effects.push_str(&rgb_formatted);
+            } else {
+                let fg_code = ANSI_CODES.get(&val).expect("Cannot find color name").to_string();
+                let fg_formatted = format!("{}[38;5;{}m", escape, fg_code);
+                all_effects.push_str(&fg_formatted);
+            }
         } else if command == "bg"{
-            let bg_code = ANSI_CODES.get(&val).expect("Cannot find color name").to_string();
-            let bg_formatted = format!("{}[48;5;{}m", escape, bg_code);
-            all_effects.push_str(&bg_formatted);
+            if val.starts_with("rgb("){
+                let trimmed_start = val.trim_start_matches("rgb(");
+                let trimmed_end = trimmed_start.trim_end_matches(")");
+                let rgb: Vec<&str> = trimmed_end.split(',').collect();
+                let rgb_formatted = format!("{}[48;2;{};{};{}m", escape, rgb[0], rgb[1], rgb[2]);
+                all_effects.push_str(&rgb_formatted);
+            } else {
+                let bg_code = ANSI_CODES.get(&val).expect("Cannot find color name").to_string();
+                let bg_formatted = format!("{}[48;5;{}m", escape, bg_code);
+                all_effects.push_str(&bg_formatted);
+            }
         } else if command == "eff"{
             let user_effects: Vec<&str> = val.split(',').collect();
             for effect in user_effects{
