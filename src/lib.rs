@@ -281,67 +281,50 @@ pub fn text(text: &str, format: &str) -> String{
     ]);
 
     let escape = "\x1b";
-    let rs_bracket = "[";
     let end_seq = "\x1b[0m";
     let mut all_effects = String::from("");
-    //  my_string.push_str(", ");
+
     let parts: Vec<&str> = format.split_whitespace().collect();
+    for part in parts{
+        let part_all: Vec<&str> = part.split(':').collect(); // ex fg:red
+        let command = part_all[0]; // ex fg
+        let val = part_all[1]; // ex red
 
-    // foreground
-    let fg_raw = &parts[0];
-    let fg_all: Vec<&str> = fg_raw.split(':').collect();
-    let fg_user = fg_all[1];
-    let fg = ANSI_CODES.get(&fg_user).expect("REASON").to_string();
-
-    // background
-    let bg_raw = &parts[1];
-    let bg_all: Vec<&str> = bg_raw.split(':').collect();
-    let bg_user = bg_all[1];
-    let bg = ANSI_CODES.get(&bg_user).expect("REASON").to_string();
-
-    // bold
-    let b_raw = &parts[2];
-    let b_all: Vec<&str> = b_raw.split(':').collect();
-    let bold = b_all[1];
-
-    // effect
-    let eff_raw = &parts[3];
-    let eff_all: Vec<&str> = eff_raw.split(':').collect();
-    let eff = eff_all[1];
-
-    let fg_f = format!("{}[38;5;{}m", escape, fg);
-    let bg_f = format!("{}[48;5;{}m", escape, bg);
-
-    match eff {
-        "i" => {
-            let e = format!("{}[23m", escape);
-            all_effects.push_str(&e);
-        },
-        "blink" => {
-            let e = format!("{}[5m", escape);
-            all_effects.push_str(&e);
-        },
-        &_ => {
-            all_effects.push_str("");
+        if command == "fg"{ 
+            let fg_code = ANSI_CODES.get(&val).expect("Cannot find color name").to_string();
+            let fg_formatted = format!("{}[38;5;{}m", escape, fg_code);
+            all_effects.push_str(&fg_formatted);
+        } else if command == "bg"{
+            let bg_code = ANSI_CODES.get(&val).expect("Cannot find color name").to_string();
+            let bg_formatted = format!("{}[48;5;{}m", escape, bg_code);
+            all_effects.push_str(&bg_formatted);
+        } else if command == "eff"{
+            let user_effects: Vec<&str> = val.split(',').collect();
+            for effect in user_effects{
+                match effect {
+                    "i" => {
+                        let e = format!("{}[3m", escape);
+                        all_effects.push_str(&e);
+                    },
+                    "blink" => {
+                        let e = format!("{}[5m", escape);
+                        all_effects.push_str(&e);
+                    },
+                    "u" => {
+                        let e = format!("{}[4m", escape);
+                        all_effects.push_str(&e);
+                    },
+                    "b" => {
+                        let e = format!("{}[1m", escape);
+                        all_effects.push_str(&e);
+                    },
+                    &_ => {
+                        all_effects.push_str("");
+                    }
+                }
+            }
         }
     }
-
-    match bold {
-        "1" => {
-            let e = format!("{}[1m", escape);
-            all_effects.push_str(&e);
-        },
-        "0" => {
-
-        },
-        &_ => {
-            panic!("bold must be 0 or 1")
-        }
-    }
-
-    all_effects.push_str(&fg_f);
-    all_effects.push_str(&bg_f);
-    // sall_effects.push_str(&bg_f);
 
     format!("{}{}{}", all_effects, text, end_seq)
 }
