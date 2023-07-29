@@ -7,12 +7,12 @@ fn main(){
     print(vec);
 
     let arr = [text(" supports ", "")];
-    print(&arr);
+    print(arr);
 
-    print(&[
-    	text(" many ", "bg:sea_green2 fg:black eff:i"),
-    	text(" features ", ""),
-    	text(" out of the box ", "bg:yellow fg:black"),
-    	text("\n", "")
-    	]);
+    print([
+        text(" many ", "bg:sea_green2 fg:black eff:i"),
+        text(" features ", ""),
+        text(" out of the box ", "bg:yellow fg:black"),
+        text("\n", "")
+        ]);
 }
