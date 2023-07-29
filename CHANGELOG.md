@@ -1,6 +1,7 @@
 0.3.0
 
 - Print accepts arrays and vectors
+- Emoji shortcodes
 
 0.2.0
 
