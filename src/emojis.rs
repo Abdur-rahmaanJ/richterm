@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub fn emoji_shortcodes() -> HashMap<&'static str, str>{
+pub fn emoji_shortcodes() -> HashMap<&'static str, &'static str>{
 	let emojis = HashMap::from([
         ("1st_place_medal", "🥇"),
         ("2nd_place_medal", "🥈"),

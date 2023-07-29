@@ -1,4 +1,8 @@
 mod colors;
+mod emojis;
+use regex::Regex;
+use regex::escape;
+
 pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     let slice: &[U] = data.as_ref();
     
@@ -8,12 +12,28 @@ pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     }
 }
 
+// Function to replace emoji shortcodes in a given text
+fn replace_emoji_shortcodes(text: &str) -> String {
+    let emoji_map = emojis::emoji_shortcodes();
+    let mut replaced_text = String::from(text);
+
+    for (shortcode, emoji) in emoji_map.iter() {
+        let regex_str = format!(":{}:", escape(shortcode));
+        let regex = Regex::new(&regex_str).unwrap();
+
+        replaced_text = regex.replace_all(&replaced_text, *emoji).to_string();
+    }
+
+    replaced_text
+}
+
+
 // fg:100 bg:200 b:0 eff:i
 pub fn text(usertext: &str, format: &str) -> String{
 
     // basic checks
     if  format.is_empty(){
-        let retstr = String::from(usertext);
+        let retstr = replace_emoji_shortcodes(usertext);
         return retstr;
     }
 
@@ -22,6 +42,7 @@ pub fn text(usertext: &str, format: &str) -> String{
     let end_seq = "\x1b[0m";
     let mut all_effects = String::from("");
     let ansi_codes = colors::ansi_color_codes();
+    
 
     let parts: Vec<&str> = format.split_whitespace().collect();
     for part in parts{
@@ -93,8 +114,9 @@ pub fn text(usertext: &str, format: &str) -> String{
         }
     }
 
+    let usert = replace_emoji_shortcodes(usertext);
     // TODO: emoji
-    let to_ret = format!("{}{}{}", all_effects, usertext, end_seq);
+    let to_ret = format!("{}{}{}", all_effects, usert, end_seq);
 
     to_ret
 }

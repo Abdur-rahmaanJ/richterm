@@ -18,8 +18,15 @@ fn main(){
     print([
         text(" many ", "bg:sea_green2 fg:black eff:i"),
         text(" features ", ""),
-        text(" out of the box ", "bg:yellow fg:black"),
+        text(" out of the box", "bg:yellow fg:black"),
         text("\n", "")
+        ]);
+
+        print([
+            text("Even", ""),
+            text(" some ", "eff:b"),
+            text("emojis like :+1: :apple: :bar_chart: :airplane_departure: :baguette_bread: :minibus:", ""),
+            text("\n", "")
         ]);
 }
 ```
@@ -42,3 +49,7 @@ fn main(){
 - blink - blink
 - d - dim
 - r - reverse
+
+### emojis
+
+Try github-flavoured shortcodes
