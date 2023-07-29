@@ -9,32 +9,6 @@ pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     }
 }
 
-
-// === utils ===
-fn concatenate_strings(strings: Vec<&str>) -> String {
-    strings.join("")
-}
-
-fn string_to_hex(input: &str) -> String {
-    input
-        .chars()
-        .map(|c| format!("{:02X}", c as u8))
-        .collect()
-}
-
-fn is_string_numeric(str: String) -> bool {
-    for c in str.chars() {
-        if !c.is_numeric() {
-            return false;
-        }
-    }
-    return true;
-}
-
-// fn determine_fg_val(fg_user: &str, ANSI_CODES: HashMap<&str, i32>) -> Option<i32> {
-//     ANSI_CODES.get(fg_user).copied()
-// }
-
 // fg:100 bg:200 b:0 eff:i
 pub fn text(usertext: &str, format: &str) -> String{
 
@@ -3918,7 +3892,7 @@ pub fn text(usertext: &str, format: &str) -> String{
         } else if command == "bg"{
             if val.starts_with("rgb("){
                 let trimmed_start = val.trim_start_matches("rgb(");
-                let trimmed_end = trimmed_start.trim_end_matches(")");
+                let trimmed_end = trimmed_start.trim_end_matches(')');
                 let rgb: Vec<&str> = trimmed_end.split(',').collect();
                 let rgb_formatted = format!("{}[48;2;{};{};{}m", escape, rgb[0], rgb[1], rgb[2]);
                 all_effects.push_str(&rgb_formatted);
