@@ -1,17 +1,14 @@
 use std::collections::HashMap;
 
-pub fn print(args: &[&String]) {
-        for arg in args {
-            print!("{}", arg);
-        }
+pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
+    let slice: &[U] = data.as_ref();
+    
+    for item in slice {
+        // Process the elements here
+        print!("{}", item);
     }
-
-pub fn printvec(args: &Vec<&str>) {
-    for arg in args {
-        print!("{}", arg);
-    }
-    print!("\n");
 }
+
 
 // === utils ===
 fn concatenate_strings(strings: Vec<&str>) -> String {
@@ -3971,5 +3968,7 @@ pub fn text(usertext: &str, format: &str) -> String{
     }
 
     // TODO: emoji
-    format!("{}{}{}", all_effects, usertext, end_seq)
+    let to_ret = format!("{}{}{}", all_effects, usertext, end_seq);
+
+    to_ret
 }
