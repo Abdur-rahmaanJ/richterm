@@ -1,5 +1,7 @@
 # richterm
 
+![](https://github.com/Abdur-rahmaanJ/richterm/blob/a30e6694581dbf5981b072a60a98a3698688a3d6/richterm.gif)
+
 
 ```rust
 use richterm::text;
