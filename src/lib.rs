@@ -2,6 +2,8 @@ mod colors;
 mod emojis;
 use regex::Regex;
 use regex::escape;
+use std::io::{self, Write};
+
 
 pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     let slice: &[U] = data.as_ref();
@@ -9,7 +11,9 @@ pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     for item in slice {
         // Process the elements here
         print!("{}", item);
+        io::stdout().flush().unwrap();
     }
+
 }
 
 // Function to replace emoji shortcodes in a given text
@@ -106,6 +110,14 @@ pub fn text(usertext: &str, format: &str) -> String{
                         let e = format!("{}[7m", escape);
                         all_effects.push_str(&e);
                     },
+                    "hc" => {
+                        let e = format!("{}[?25l", escape);
+                        all_effects.push_str(&e);
+                    },
+                    "sc" => {
+                        let e = format!("{}[?25h", escape);
+                        all_effects.push_str(&e);
+                    },
                     &_ => {
                         all_effects.push_str("");
                     }
@@ -119,4 +131,97 @@ pub fn text(usertext: &str, format: &str) -> String{
     let to_ret = format!("{}{}{}", all_effects, usert, end_seq);
 
     to_ret
+}
+
+use std::iter::Iterator;
+
+
+// Custom Iterator struct
+pub struct MyRange<'a>{
+    start: i32,
+    end: i32,
+    description: &'a str,
+    bar_width: i32,
+    display: &'a str,
+    elapsed_time_f: String
+}
+
+// Implement the Iterator trait for MyRange
+impl Iterator for MyRange<'_>{
+    type Item = i32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.start <= self.end {
+            let current = self.start;
+            self.start += 1;
+            Some(current)
+        } else {
+            None
+        }
+    }
+}
+
+impl Drop for MyRange<'_>{
+    fn drop(&mut self) {
+        // Code to be executed after the last iteration.
+        print([
+            text("\r ", ""),
+            text(self.description, ""),
+            text(" ",""),
+            text(&self.display.repeat(self.bar_width.try_into().unwrap()), "fg:green"),
+            text(" 100% ", "fg:magenta"),
+            text(&self.elapsed_time_f, "fg:orange1"),
+            text("\n",""),
+            ]);
+    }
+}
+
+// Idk what i wrote here
+fn create_range<'a>(start: i32, end: i32, description: &'a str, bar_width: i32, display: &'a str, elapsed_time_f: String) -> MyRange<'a> {
+    MyRange { start, end, description, bar_width, display, elapsed_time_f }
+}
+
+use std::time::{Duration, Instant};
+
+fn format_duration(duration: Duration) -> String {
+    let hours = duration.as_secs() / 3600;
+    let minutes = (duration.as_secs() % 3600) / 60;
+    let seconds = duration.as_secs() % 60;
+
+    format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
+}
+
+pub fn track(step: i32, description: &str) -> MyRange<'_>{
+    // Downloading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:21
+    let len_itr = step;//range.start_bound() - range.end_bound();
+    let bar_width = 40;
+    let display = "━";
+    let incr = bar_width/len_itr as i32;
+    let mut step = 0;
+    let start_time = Instant::now();
+    for _item in 1..len_itr{
+        let perc = (step as f32 /bar_width as f32) * 100.0;
+        let elapsed_time = start_time.elapsed();
+        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
+
+        print([
+            text("\r ", "eff:hc"),
+            text(description, ""),
+            text(" ",""),
+            text(&display.repeat(step.try_into().unwrap()), "fg:deep_pink3"),
+            text(&display.repeat((bar_width-step).try_into().unwrap()), "fg:black"),
+            text(&format!(" {}% ", perc as i32), "fg:magenta"),
+            text(&elapsed_time_f, "fg:steel_blue eff:sc")
+            ]);
+
+
+        step = step + incr;
+    }
+
+    
+    let elapsed_time = start_time.elapsed();
+    let elapsed_time_f = format_duration(elapsed_time);
+    return create_range(1, len_itr, description, bar_width, display, elapsed_time_f);
+
+
 }

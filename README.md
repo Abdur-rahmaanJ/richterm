@@ -6,6 +6,10 @@
 ```rust
 use richterm::text;
 use richterm::print;
+use richterm::track;
+
+use std::{thread, time};
+
 
 fn main(){
 
@@ -22,12 +26,26 @@ fn main(){
         text("\n", "")
         ]);
 
-        print([
-            text("Even", ""),
-            text(" some ", "eff:b"),
-            text("emojis like :+1: :apple: :bar_chart: :airplane_departure: :baguette_bread: :minibus:", ""),
-            text("\n", "")
-        ]);
+    print([
+        text("Even", ""),
+        text(" some ", "eff:b"),
+        text("emojis like :+1: :apple: :bar_chart: :airplane_departure: :baguette_bread: :minibus:", ""),
+        text("\n", "")
+    ]);
+
+    for _item in track(5, "Downloading ..."){
+        let ten_millis = time::Duration::from_millis(5);
+        thread::sleep(ten_millis);
+    }
+    for _item in track(5, "Downloading ..."){
+        let ten_millis = time::Duration::from_millis(5);
+        thread::sleep(ten_millis);
+    }
+    for _item in track(5, "Downloading ..."){
+        let ten_millis = time::Duration::from_millis(5);
+        thread::sleep(ten_millis);
+    }
+
 }
 ```
 
@@ -53,3 +71,7 @@ fn main(){
 ### emojis
 
 Try github-flavoured shortcodes
+
+### track(5, "description")
+
+Progressbar
