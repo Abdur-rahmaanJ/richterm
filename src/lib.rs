@@ -1,7 +1,6 @@
 mod colors;
 mod emojis;
 use regex::Regex;
-use std::fmt::Debug;
 use regex::escape;
 use std::io::{self, Write};
 
@@ -111,6 +110,14 @@ pub fn text(usertext: &str, format: &str) -> String{
                         let e = format!("{}[7m", escape);
                         all_effects.push_str(&e);
                     },
+                    "hc" => {
+                        let e = format!("{}[?25l", escape);
+                        all_effects.push_str(&e);
+                    },
+                    "sc" => {
+                        let e = format!("{}[?25h", escape);
+                        all_effects.push_str(&e);
+                    },
                     &_ => {
                         all_effects.push_str("");
                     }
@@ -126,7 +133,6 @@ pub fn text(usertext: &str, format: &str) -> String{
     to_ret
 }
 
-use std::ops::Range;
 use std::iter::Iterator;
 
 
@@ -136,7 +142,8 @@ pub struct MyRange<'a>{
     end: i32,
     description: &'a str,
     bar_width: i32,
-    display: &'a str
+    display: &'a str,
+    elapsed_time_f: String
 }
 
 // Implement the Iterator trait for MyRange
@@ -162,15 +169,16 @@ impl Drop for MyRange<'_>{
             text(self.description, ""),
             text(" ",""),
             text(&self.display.repeat(self.bar_width.try_into().unwrap()), "fg:green"),
-            text(" %100 --:--:--", ""),
+            text(" 100% ", "fg:magenta"),
+            text(&self.elapsed_time_f, "fg:orange1"),
             text("\n",""),
             ]);
     }
 }
 
 // Idk what i wrote here
-fn create_range<'a>(start: i32, end: i32, description: &'a str, bar_width: i32, display: &'a str) -> MyRange<'a> {
-    MyRange { start, end, description, bar_width, display }
+fn create_range<'a>(start: i32, end: i32, description: &'a str, bar_width: i32, display: &'a str, elapsed_time_f: String) -> MyRange<'a> {
+    MyRange { start, end, description, bar_width, display, elapsed_time_f }
 }
 
 use std::time::{Duration, Instant};
@@ -184,27 +192,26 @@ fn format_duration(duration: Duration) -> String {
 }
 
 pub fn track(step: i32, description: &str) -> MyRange<'_>{
-    // Downloading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:00 0:00:21
+    // Downloading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:21
     let len_itr = step;//range.start_bound() - range.end_bound();
     let bar_width = 40;
     let display = "━";
     let incr = bar_width/len_itr as i32;
     let mut step = 0;
     let start_time = Instant::now();
-    for item in 1..len_itr{
-        let fraction = (step/bar_width) * bar_width;
-        let intfrac = fraction as i32;
+    for _item in 1..len_itr{
         let perc = (step as f32 /bar_width as f32) * 100.0;
         let elapsed_time = start_time.elapsed();
-        let elapsed_time_f = format!("{}", format_duration(elapsed_time));
+        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
+
         print([
-            text("\r ", ""),
+            text("\r ", "eff:hc"),
             text(description, ""),
             text(" ",""),
             text(&display.repeat(step.try_into().unwrap()), "fg:deep_pink3"),
             text(&display.repeat((bar_width-step).try_into().unwrap()), "fg:black"),
             text(&format!(" {}% ", perc as i32), "fg:magenta"),
-            text(&elapsed_time_f, "fg:orange1")
+            text(&elapsed_time_f, "fg:steel_blue eff:sc")
             ]);
 
 
@@ -212,8 +219,9 @@ pub fn track(step: i32, description: &str) -> MyRange<'_>{
     }
 
     
-
-    return create_range(1, len_itr, description, bar_width, display);
+    let elapsed_time = start_time.elapsed();
+    let elapsed_time_f = format_duration(elapsed_time);
+    return create_range(1, len_itr, description, bar_width, display, elapsed_time_f);
 
 
 }
