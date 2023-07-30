@@ -1,3 +1,7 @@
+0.4.0
+
+- track/Progressbar
+
 0.3.0
 
 - Print accepts arrays and vectors
