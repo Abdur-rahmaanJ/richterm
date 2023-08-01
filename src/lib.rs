@@ -83,7 +83,7 @@ pub fn text(usertext: &str, format: &str) -> String {
             for effect in user_effects {
                 match effect {
                     "i" => {
-                        let e = format!("{}[3m", escape);
+                        let e = format!("{}[3m", escape); // TODO instead of writing format and push_str in all cases create fn with arg
                         all_effects.push_str(&e);
                     }
                     "blink" => {
@@ -163,8 +163,8 @@ struct BrogressBar<'a> {
 impl BrogressBar<'_> {
     fn new(steps: i32, description: &str) -> BrogressBar {
         BrogressBar {
-            description: description,
-            steps: steps,
+            description,
+            steps,
             start_time: Instant::now(),
             display: "━",
             bar_width: 40,
