@@ -133,6 +133,86 @@ pub fn text(usertext: &str, format: &str) -> String{
     to_ret
 }
 
+
+trait Show {
+    fn show(&self, step_now: i32);
+}
+
+trait ShowCompleted {
+    fn show_completed(&self);
+}
+
+// We at richterm promote the community.
+// Pro-gress implies individualistic excellence,
+// which denotes a group of elites in their craft and
+// average people.
+// This is why we at richterm promote bro-gress.
+// We operate, despite the  differences in levels, 
+// as siblings. This increases the rate of achieving the 
+// targetted objective drastically.
+// Note: Summary for the lazy:
+//   We simply operate as bros, rather than pros.
+#[derive(Debug)]
+struct BrogressBar <'a>{
+    description: &'a str,
+    steps: i32,
+    start_time: Instant,
+    display: &'a str,
+    bar_width: i32
+}
+
+impl BrogressBar <'_>{
+    fn new(
+        steps: i32,
+        description: &str,
+        ) -> BrogressBar {
+        BrogressBar{
+            description: description,
+            steps: steps,
+            start_time: Instant::now(),
+            display: "━",
+            bar_width: 40
+        }
+    }
+}
+
+impl Show for BrogressBar <'_>{
+    fn show(&self, step_now: i32){
+        let perc = (step_now as f32 /self.steps as f32) * 100.0;
+        let done = ((step_now as f64/self.steps as f64) * self.bar_width as f64) as i32;
+        let undone = self.bar_width - done;
+        let elapsed_time = self.start_time.elapsed();
+        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
+
+        print([
+            text("\r ", "eff:hc"),
+            text(self.description, ""),
+            text(" ",""),
+            text(&self.display.repeat(done.try_into().unwrap()), "fg:deep_pink3"),
+            text(&self.display.repeat(undone.try_into().unwrap()), "fg:black"),
+            text(&format!(" {}% ", perc as i32), "fg:magenta"),
+            text(&elapsed_time_f, "fg:steel_blue eff:sc")
+            ]);
+    }
+}
+
+
+impl ShowCompleted for BrogressBar <'_>{
+    fn show_completed(&self){
+        let elapsed_time = self.start_time.elapsed();
+        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
+        print([
+            text("\r ", ""),
+            text(self.description, ""),
+            text(" ",""),
+            text(&self.display.repeat(self.bar_width.try_into().unwrap()), "fg:green"),
+            text(" 100% ", "fg:magenta"),
+            text(&elapsed_time_f, "fg:orange1"),
+            text("\n",""),
+            ]);
+    }
+}
+
 use std::iter::Iterator;
 
 
@@ -140,10 +220,7 @@ use std::iter::Iterator;
 pub struct MyRange<'a>{
     start: i32,
     end: i32,
-    description: &'a str,
-    bar_width: i32,
-    display: &'a str,
-    elapsed_time_f: String
+    brogress_bar: BrogressBar<'a>
 }
 
 // Implement the Iterator trait for MyRange
@@ -164,21 +241,13 @@ impl Iterator for MyRange<'_>{
 impl Drop for MyRange<'_>{
     fn drop(&mut self) {
         // Code to be executed after the last iteration.
-        print([
-            text("\r ", ""),
-            text(self.description, ""),
-            text(" ",""),
-            text(&self.display.repeat(self.bar_width.try_into().unwrap()), "fg:green"),
-            text(" 100% ", "fg:magenta"),
-            text(&self.elapsed_time_f, "fg:orange1"),
-            text("\n",""),
-            ]);
+        self.brogress_bar.show_completed();
     }
 }
 
 // Idk what i wrote here
-fn create_range<'a>(start: i32, end: i32, description: &'a str, bar_width: i32, display: &'a str, elapsed_time_f: String) -> MyRange<'a> {
-    MyRange { start, end, description, bar_width, display, elapsed_time_f }
+fn create_range<'a>(start: i32, end: i32, brogress_bar: BrogressBar<'a>) -> MyRange<'a> {
+    MyRange { start, end, brogress_bar }
 }
 
 use std::time::{Duration, Instant};
@@ -191,37 +260,17 @@ fn format_duration(duration: Duration) -> String {
     format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
 }
 
-pub fn track(step: i32, description: &str) -> MyRange<'_>{
+
+pub fn track(steps: i32, description: &str) -> MyRange<'_>{
     // Downloading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:21
-    let len_itr = step;//range.start_bound() - range.end_bound();
-    let bar_width = 40;
-    let display = "━";
-    let incr = bar_width/len_itr as i32;
-    let mut step = 0;
-    let start_time = Instant::now();
-    for _item in 1..len_itr{
-        let perc = (step as f32 /bar_width as f32) * 100.0;
-        let elapsed_time = start_time.elapsed();
-        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
 
-        print([
-            text("\r ", "eff:hc"),
-            text(description, ""),
-            text(" ",""),
-            text(&display.repeat(step.try_into().unwrap()), "fg:deep_pink3"),
-            text(&display.repeat((bar_width-step).try_into().unwrap()), "fg:black"),
-            text(&format!(" {}% ", perc as i32), "fg:magenta"),
-            text(&elapsed_time_f, "fg:steel_blue eff:sc")
-            ]);
+    let mut step_now = 1;
+    let brogress_bar = BrogressBar::new(steps, description);
+    for _item in 1..steps{
+        brogress_bar.show(step_now);
 
-
-        step = step + incr;
+        step_now = step_now + 1;
     }
-
-    
-    let elapsed_time = start_time.elapsed();
-    let elapsed_time_f = format_duration(elapsed_time);
-    return create_range(1, len_itr, description, bar_width, display, elapsed_time_f);
-
+    return create_range(1, steps, brogress_bar);
 
 }
