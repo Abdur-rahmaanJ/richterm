@@ -7,7 +7,8 @@ impl Uuid {
     fn new() -> Self {
         let now = SystemTime::now();
         let timestamp = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
-        let uuid_value = u128::from(timestamp.as_secs()) << 64 | u128::from(timestamp.subsec_nanos());
+        let uuid_value =
+            u128::from(timestamp.as_secs()) << 64 | u128::from(timestamp.subsec_nanos());
         Uuid(uuid_value)
     }
 }
