@@ -1,8 +1,10 @@
 mod colors;
 mod emojis;
+mod uuid;
 use regex::escape;
 use regex::Regex;
 use std::io::{self, Write};
+use std::collections::HashMap;
 
 pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     let slice: &[U] = data.as_ref();
@@ -133,8 +135,9 @@ pub fn text(usertext: &str, format: &str) -> String {
     to_ret
 }
 
+// === BrogressBar ===
 trait Show {
-    fn show(&self, step_now: i32);
+    fn show(&self);
 }
 
 trait ShowCompleted {
@@ -151,57 +154,119 @@ trait ShowCompleted {
 // targetted objective drastically.
 // Note: Summary for the lazy:
 //   We simply operate as bros, rather than pros.
-#[derive(Debug)]
-struct BrogressBar<'a> {
-    description: &'a str,
+#[derive(Debug, Clone)]
+pub struct BrogressBar {
+    description: String,
     steps: i32,
+    steps_done: f32,
     start_time: Instant,
-    display: &'a str,
+    display: String,
     bar_width: i32,
+    time_taken_f: String,
+    is_finished: bool
 }
 
-impl BrogressBar<'_> {
-    fn new(steps: i32, description: &str) -> BrogressBar {
+impl BrogressBar {
+    pub fn new(steps: i32, description: &str) -> BrogressBar {
         BrogressBar {
-            description: description,
+            description: description.to_string(),
             steps: steps,
+            steps_done: 0.0,
             start_time: Instant::now(),
-            display: "━",
+            display: "━".to_string(),
             bar_width: 40,
+            time_taken_f: "".to_string(),
+            is_finished: false
         }
     }
-}
 
-impl Show for BrogressBar<'_> {
-    fn show(&self, step_now: i32) {
-        let perc = (step_now as f32 / self.steps as f32) * 100.0;
-        let done = ((step_now as f64 / self.steps as f64) * self.bar_width as f64) as i32;
+    pub fn update(&mut self, step: f32){
+        let elapsed_time = self.start_time.elapsed();
+        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
+
+        if (self.steps_done + step) >= self.steps as f32{
+            self.steps_done = self.steps as f32;
+            self.is_finished = true;
+        }else{
+            self.steps_done = self.steps_done + step;
+        }
+    }
+
+
+    pub fn finished(&self) -> bool{
+        if (self.steps_done / self.steps as f32) == 1.0{
+            return true
+        }
+        return false
+    }
+
+    pub fn get_show_texts(&self) -> Vec<String>{
+        let perc = (self.steps_done as f64 / self.steps as f64) * 100.0;
+        let done = ((self.steps_done as f64 / self.steps as f64) * self.bar_width as f64) as i32;
         let undone = self.bar_width - done;
         let elapsed_time = self.start_time.elapsed();
         let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
 
-        print([
-            text("\r ", "eff:hc"),
-            text(self.description, ""),
-            text(" ", ""),
-            text(
-                &self.display.repeat(done.try_into().unwrap()),
-                "fg:deep_pink3",
-            ),
-            text(&self.display.repeat(undone.try_into().unwrap()), "fg:black"),
-            text(&format!(" {}% ", perc as i32), "fg:magenta"),
-            text(&elapsed_time_f, "fg:steel_blue eff:sc"),
-        ]);
+        let mut v = vec![];
+        if self.is_finished{
+            v.extend(vec![
+                text("\r ", ""),
+                text(&self.description, ""),
+                text(" ", ""),
+                text(
+                    &self.display.repeat(self.bar_width.try_into().unwrap()),
+                    "fg:green",
+                ),
+                text(" 100% ", "fg:magenta"),
+                text(&self.time_taken_f, "fg:orange1"),
+            ]);
+        }
+        else {
+            v.extend(vec![
+                text("\r ", "eff:hc"),
+                text(&self.description, ""),
+                text(" ", ""),
+                text( 
+                    &self.display.repeat(done.try_into().unwrap()),
+                    "fg:deep_pink3",
+                ),
+                text(&self.display.repeat(undone.try_into().unwrap()), "fg:black"),
+                text(&format!(" {}% ", perc as i32), "fg:magenta"),
+                text(&elapsed_time_f, "fg:steel_blue eff:sc"),
+            ]);
+        }
+
+        v
+        
     }
 }
 
-impl ShowCompleted for BrogressBar<'_> {
-    fn show_completed(&self) {
+impl Show for BrogressBar {
+    fn show(&self) {
+        let perc = (self.steps_done as f64 / self.steps as f64) * 100.0;
+        let done = ((self.steps_done as f64 / self.steps as f64) * self.bar_width as f64) as i32;
+        let undone = self.bar_width - done;
         let elapsed_time = self.start_time.elapsed();
         let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
-        print([
+        if self.is_finished{
+            print([
+                text("\r ", "eff:hc"),
+                text(&self.description, ""),
+                text(" ", ""),
+                text( 
+                    &self.display.repeat(done.try_into().unwrap()),
+                    "fg:deep_pink3",
+                ),
+                text(&self.display.repeat(undone.try_into().unwrap()), "fg:black"),
+                text(&format!(" {}% ", perc as i32), "fg:magenta"),
+                text(&elapsed_time_f, "fg:steel_blue eff:sc"),
+                text(&format!("\x1B[{}F", "1"), "")
+            ]);
+
+        } else{
+            print([
             text("\r ", ""),
-            text(self.description, ""),
+            text(&self.description, ""),
             text(" ", ""),
             text(
                 &self.display.repeat(self.bar_width.try_into().unwrap()),
@@ -209,7 +274,27 @@ impl ShowCompleted for BrogressBar<'_> {
             ),
             text(" 100% ", "fg:magenta"),
             text(&elapsed_time_f, "fg:orange1"),
-            text("\n", ""),
+            text("\n", "")
+        ]);
+        }
+    }
+}
+
+impl ShowCompleted for BrogressBar {
+    fn show_completed(&self) {
+        let elapsed_time = self.start_time.elapsed();
+        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
+        print([
+            text("\r ", ""),
+            text(&self.description, ""),
+            text(" ", ""),
+            text(
+                &self.display.repeat(self.bar_width.try_into().unwrap()),
+                "fg:green",
+            ),
+            text(" 100% ", "fg:magenta"),
+            text(&elapsed_time_f, "fg:orange1"),
+            text("\n", "")
         ]);
     }
 }
@@ -217,14 +302,14 @@ impl ShowCompleted for BrogressBar<'_> {
 use std::iter::Iterator;
 
 // Custom Iterator struct
-pub struct MyRange<'a> {
+pub struct MyRange {
     start: i32,
     end: i32,
-    brogress_bar: BrogressBar<'a>,
+    brogress_bar: BrogressBar,
 }
 
 // Implement the Iterator trait for MyRange
-impl Iterator for MyRange<'_> {
+impl Iterator for MyRange {
     type Item = i32;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -238,7 +323,7 @@ impl Iterator for MyRange<'_> {
     }
 }
 
-impl Drop for MyRange<'_> {
+impl Drop for MyRange {
     fn drop(&mut self) {
         // Code to be executed after the last iteration.
         self.brogress_bar.show_completed();
@@ -246,7 +331,7 @@ impl Drop for MyRange<'_> {
 }
 
 // Idk what i wrote here
-fn create_range<'a>(start: i32, end: i32, brogress_bar: BrogressBar<'a>) -> MyRange<'a> {
+fn create_range<'a>(start: i32, end: i32, brogress_bar: BrogressBar) -> MyRange {
     MyRange {
         start,
         end,
@@ -264,15 +349,102 @@ fn format_duration(duration: Duration) -> String {
     format!("{:02}:{:02}:{:02}", hours, minutes, seconds)
 }
 
-pub fn track(steps: i32, description: &str) -> MyRange<'_> {
+
+#[derive(Clone)]
+pub struct Brogress {
+    pub finished: bool,
+    tasks: HashMap<String, BrogressBar>,
+    inserts_order: Vec<String>
+}
+
+
+impl Brogress {
+    fn new() -> Self {
+        Brogress { 
+            finished: false,
+            tasks: HashMap::new(),
+            inserts_order: Vec::new()
+        }
+    }
+
+    pub fn add_task(&mut self, description: &str, steps: i32) -> String {
+        let x = uuid::generate_random_uuid();
+        let brogress_bar = BrogressBar::new(steps, description);
+        self.tasks.insert(x.clone(), brogress_bar);
+        self.inserts_order.push(x.clone());
+        x.to_string()
+    }
+
+    pub fn update(&mut self, uuid: String, step:f32) {
+        if self.finished{
+            print([
+                text("", "eff:sc"),
+                text(&format!("\x1B[{}B", self.tasks.len()), "")
+                ]);
+            return
+        }
+        if !self.tasks.contains_key(&uuid){
+            println!("Cannot find tasks");
+        }
+
+        
+
+        // let brogress_bar = self.tasks.get_mut(uuid).as_mut();
+        let Some(brogress_bar) = self.tasks.get_mut(&uuid) else { todo!() };
+        brogress_bar.update(step);
+        // brogress_bar.show();
+        let moveup = "\x1B[1F";
+        let movedown = "\x1B[2B";
+        // let repeated_chars: String = std::iter::repeat(moveuperase).take(self.tasks.len()).collect();
+        let mut sum_finished = 0;
+        let mut index = 0;
+
+
+        let mut to_print = vec![text("", "eff:hc")];
+
+        for uuid in &self.inserts_order {
+            let brogress_bar = self.tasks.get(uuid);
+            if brogress_bar.expect("REASON").finished(){
+                sum_finished += 1;
+            }
+            // brogress_bar.expect("REASON").show();
+            to_print.extend(brogress_bar.expect("REASON").get_show_texts());
+            to_print.push("\n".to_string());
+        }
+
+        print(to_print);
+
+        print!("\x1B[{}F", self.tasks.len());
+
+        if sum_finished == self.tasks.len(){
+            self.finished = true;
+        }
+
+        
+    }
+}
+
+// impl Drop for Brogress {
+//     fn drop(&mut self) {
+//         // This block will be executed when the object goes out of scope
+//         println!("Cleaning up resources for data: {}", self.data);
+//         // Perform any necessary cleanup or resource release here
+//     }
+// }
+
+pub fn track(steps: i32, description: &str) -> MyRange{
     // Downloading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:21
 
-    let mut step_now = 1;
-    let brogress_bar = BrogressBar::new(steps, description);
+    let mut brogress_bar = BrogressBar::new(steps, description);
     for _item in 1..steps {
-        brogress_bar.show(step_now);
-
-        step_now = step_now + 1;
+        brogress_bar.update(1.0);
+        brogress_bar.show();
     }
     return create_range(1, steps, brogress_bar);
+}
+
+pub fn progress() -> Brogress{
+    let p = Brogress::new();
+
+    p
 }
