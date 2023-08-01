@@ -187,6 +187,9 @@ impl BrogressBar {
         if (self.steps_done + step) >= self.steps as f32{
             self.steps_done = self.steps as f32;
             self.is_finished = true;
+            if self.time_taken_f == ""{
+                self.time_taken_f = elapsed_time_f;
+            }
         }else{
             self.steps_done = self.steps_done + step;
         }
@@ -243,47 +246,22 @@ impl BrogressBar {
 
 impl Show for BrogressBar {
     fn show(&self) {
-        let perc = (self.steps_done as f64 / self.steps as f64) * 100.0;
-        let done = ((self.steps_done as f64 / self.steps as f64) * self.bar_width as f64) as i32;
-        let undone = self.bar_width - done;
-        let elapsed_time = self.start_time.elapsed();
-        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
-        if self.is_finished{
-            print([
-                text("\r ", "eff:hc"),
+        print([
+            text("\r ", ""),
                 text(&self.description, ""),
                 text(" ", ""),
-                text( 
-                    &self.display.repeat(done.try_into().unwrap()),
-                    "fg:deep_pink3",
+                text(
+                    &self.display.repeat(self.bar_width.try_into().unwrap()),
+                    "fg:green",
                 ),
-                text(&self.display.repeat(undone.try_into().unwrap()), "fg:black"),
-                text(&format!(" {}% ", perc as i32), "fg:magenta"),
-                text(&elapsed_time_f, "fg:steel_blue eff:sc"),
-                text(&format!("\x1B[{}F", "1"), "")
+                text(" 100% ", "fg:magenta"),
+                text(&self.time_taken_f, "fg:orange1"),
             ]);
-
-        } else{
-            print([
-            text("\r ", ""),
-            text(&self.description, ""),
-            text(" ", ""),
-            text(
-                &self.display.repeat(self.bar_width.try_into().unwrap()),
-                "fg:green",
-            ),
-            text(" 100% ", "fg:magenta"),
-            text(&elapsed_time_f, "fg:orange1"),
-            text("\n", "")
-        ]);
-        }
     }
 }
 
 impl ShowCompleted for BrogressBar {
     fn show_completed(&self) {
-        let elapsed_time = self.start_time.elapsed();
-        let elapsed_time_f = format!("{} ", format_duration(elapsed_time));
         print([
             text("\r ", ""),
             text(&self.description, ""),
@@ -293,7 +271,7 @@ impl ShowCompleted for BrogressBar {
                 "fg:green",
             ),
             text(" 100% ", "fg:magenta"),
-            text(&elapsed_time_f, "fg:orange1"),
+            text(&self.time_taken_f, "fg:orange1"),
             text("\n", "")
         ]);
     }
@@ -393,11 +371,11 @@ impl Brogress {
         let Some(brogress_bar) = self.tasks.get_mut(&uuid) else { todo!() };
         brogress_bar.update(step);
         // brogress_bar.show();
-        let moveup = "\x1B[1F";
-        let movedown = "\x1B[2B";
+        // let moveup = "\x1B[1F";
+        // let movedown = "\x1B[2B";
         // let repeated_chars: String = std::iter::repeat(moveuperase).take(self.tasks.len()).collect();
         let mut sum_finished = 0;
-        let mut index = 0;
+        // let mut index = 0;
 
 
         let mut to_print = vec![text("", "eff:hc")];
