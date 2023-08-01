@@ -1,4 +1,5 @@
 use richterm::print;
+use richterm::progress;
 use richterm::text;
 use richterm::track;
 
@@ -35,12 +36,15 @@ fn main() {
         let ten_millis = time::Duration::from_millis(5);
         thread::sleep(ten_millis);
     }
-    for _item in track(5, "Downloading ...") {
-        let ten_millis = time::Duration::from_millis(5);
-        thread::sleep(ten_millis);
-    }
-    for _item in track(5, "Downloading ...") {
-        let ten_millis = time::Duration::from_millis(5);
-        thread::sleep(ten_millis);
+
+    let mut tasks = progress();
+    let task1 = tasks.add_task("Descr1", 50);
+    let task2 = tasks.add_task("Descr2", 50);
+    let task3 = tasks.add_task("Descr3", 50);
+
+    while !tasks.finished {
+        tasks.update(task1.clone(), 10.0);
+        tasks.update(task2.clone(), 5.0);
+        tasks.update(task3.clone(), 6.0);
     }
 }

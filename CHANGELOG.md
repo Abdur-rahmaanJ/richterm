@@ -1,3 +1,8 @@
+0.5.0
+
+- feat: progress
+- progress and progressbar use structs
+
 0.4.0
 
 - track/Progressbar
