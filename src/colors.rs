@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-pub fn ansi_color_codes() -> HashMap<&'static str, i32>{
-	let ansi_codes = HashMap::from([
+pub fn ansi_color_codes() -> HashMap<&'static str, i32> {
+    let ansi_codes = HashMap::from([
         ("black", 0),
         ("red", 1),
         ("green", 2),
@@ -236,9 +236,8 @@ pub fn ansi_color_codes() -> HashMap<&'static str, i32>{
         ("grey89", 254),
         ("gray89", 254),
         ("grey93", 255),
-        ("gray93", 255)
+        ("gray93", 255),
     ]);
 
-	ansi_codes
+    ansi_codes
 }
-
