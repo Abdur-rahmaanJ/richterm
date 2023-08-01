@@ -83,3 +83,18 @@ Try github-flavoured shortcodes
 ### track(5, "description")
 
 Progressbar
+
+### progress
+
+```rust
+    let mut tasks = progress();
+    let task1 = tasks.add_task("Descr1", 50); // 50 is an arbitrary amount
+    let task2 = tasks.add_task("Descr2", 50); 
+    let task3 = tasks.add_task("Descr3", 50);
+    
+    while !tasks.finished{
+        tasks.update(task1.clone(), 10.0);  // 10.0 is an arbitrary amount to move the progress bar
+        tasks.update(task2.clone(), 5.0);   // 10.0 means 10.0/50.0
+        tasks.update(task3.clone(), 6.0);
+    } 
+```
