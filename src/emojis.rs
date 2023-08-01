@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-pub fn emoji_shortcodes() -> HashMap<&'static str, &'static str>{
-	let emojis = HashMap::from([
+pub fn emoji_shortcodes() -> HashMap<&'static str, &'static str> {
+    let emojis = HashMap::from([
         ("1st_place_medal", "🥇"),
         ("2nd_place_medal", "🥈"),
         ("3rd_place_medal", "🥉"),
@@ -397,19 +397,31 @@ pub fn emoji_shortcodes() -> HashMap<&'static str, &'static str>{
         ("backhand_index_pointing_down_dark_skin_tone", "👇🏿"),
         ("backhand_index_pointing_down_light_skin_tone", "👇🏻"),
         ("backhand_index_pointing_down_medium-dark_skin_tone", "👇🏾"),
-        ("backhand_index_pointing_down_medium-light_skin_tone", "👇🏼"),
+        (
+            "backhand_index_pointing_down_medium-light_skin_tone",
+            "👇🏼",
+        ),
         ("backhand_index_pointing_down_medium_skin_tone", "👇🏽"),
         ("backhand_index_pointing_left", "👈"),
         ("backhand_index_pointing_left_dark_skin_tone", "👈🏿"),
         ("backhand_index_pointing_left_light_skin_tone", "👈🏻"),
         ("backhand_index_pointing_left_medium-dark_skin_tone", "👈🏾"),
-        ("backhand_index_pointing_left_medium-light_skin_tone", "👈🏼"),
+        (
+            "backhand_index_pointing_left_medium-light_skin_tone",
+            "👈🏼",
+        ),
         ("backhand_index_pointing_left_medium_skin_tone", "👈🏽"),
         ("backhand_index_pointing_right", "👉"),
         ("backhand_index_pointing_right_dark_skin_tone", "👉🏿"),
         ("backhand_index_pointing_right_light_skin_tone", "👉🏻"),
-        ("backhand_index_pointing_right_medium-dark_skin_tone", "👉🏾"),
-        ("backhand_index_pointing_right_medium-light_skin_tone", "👉🏼"),
+        (
+            "backhand_index_pointing_right_medium-dark_skin_tone",
+            "👉🏾",
+        ),
+        (
+            "backhand_index_pointing_right_medium-light_skin_tone",
+            "👉🏼",
+        ),
         ("backhand_index_pointing_right_medium_skin_tone", "👉🏽"),
         ("backhand_index_pointing_up", "👆"),
         ("backhand_index_pointing_up_dark_skin_tone", "👆🏿"),
@@ -2853,14 +2865,23 @@ pub fn emoji_shortcodes() -> HashMap<&'static str, &'static str>{
         ("arrow_double_down", "⏬"),
         ("hearts", "♥"),
         ("rewind", "⏪"),
-        ("black_left__pointing_double_triangle_with_vertical_bar", "⏮"),
+        (
+            "black_left__pointing_double_triangle_with_vertical_bar",
+            "⏮",
+        ),
         ("arrow_backward", "◀"),
         ("black_medium_small_square", "◾"),
         ("question", "❓"),
         ("fast_forward", "⏩"),
-        ("black_right__pointing_double_triangle_with_vertical_bar", "⏭"),
+        (
+            "black_right__pointing_double_triangle_with_vertical_bar",
+            "⏭",
+        ),
         ("arrow_forward", "▶"),
-        ("black_right__pointing_triangle_with_double_vertical_bar", "⏯"),
+        (
+            "black_right__pointing_triangle_with_double_vertical_bar",
+            "⏯",
+        ),
         ("arrow_right", "➡"),
         ("spades", "♠"),
         ("black_square_for_stop", "⏹"),
@@ -3432,7 +3453,10 @@ pub fn emoji_shortcodes() -> HashMap<&'static str, &'static str>{
         ("fist", "✊"),
         ("hand", "✋"),
         ("raised_hand_with_fingers_splayed", "🖐"),
-        ("raised_hand_with_part_between_middle_and_ring_fingers", "🖖"),
+        (
+            "raised_hand_with_part_between_middle_and_ring_fingers",
+            "🖖",
+        ),
         ("blue_car", "🚙"),
         ("apple", "🍎"),
         ("relieved", "😌"),
@@ -3612,5 +3636,5 @@ pub fn emoji_shortcodes() -> HashMap<&'static str, &'static str>{
         ("regional_indicator_z", "🇿"),
     ]);
 
-	emojis
+    emojis
 }
