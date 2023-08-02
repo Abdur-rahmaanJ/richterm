@@ -1,8 +1,12 @@
 mod colors;
 mod emojis;
-use regex::escape;
-use regex::Regex;
-use std::io::{self, Write};
+use ::emojis::get_by_shortcode;
+use colors::find_color;
+use regex::{escape, Regex};
+use std::{
+    io::{self, Write},
+    mem::replace,
+};
 
 pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     let slice: &[U] = data.as_ref();
@@ -16,17 +20,35 @@ pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
 
 // Function to replace emoji shortcodes in a given text
 fn replace_emoji_shortcodes(text: &str) -> String {
-    let emoji_map = emojis::emoji_shortcodes();
-    let mut replaced_text = String::from(text);
+    let replaced_text = String::from(escape(text));
 
-    for (shortcode, emoji) in emoji_map.iter() {
-        let regex_str = format!(":{}:", escape(shortcode));
-        let regex = Regex::new(&regex_str).unwrap();
+    let regex = Regex::new(r"(?m)(?:[^:])(?:[^:])+").unwrap(); // to match word between two ':'
+    let mut ids = vec![];
+    let mut toreplace = vec![];
+    if regex.is_match(&replaced_text) {
+        let result = regex.captures_iter(&replaced_text);
 
-        replaced_text = regex.replace_all(&replaced_text, *emoji).to_string();
+        let _ = &result.for_each(|f| {
+            f.iter().for_each(|x: Option<regex::Match<'_>>| {
+                match get_by_shortcode(x.unwrap().as_str()) {
+                    Some(emoji) => {
+                        let _ = replace(&mut emoji.as_str(), x.unwrap().as_str());
+                        ids.push(emoji.as_str());
+                        toreplace.push(x.unwrap().as_str());
+                    }
+                    None => {}
+                }
+            })
+        });
     }
-
-    replaced_text
+    let mut i = 0;
+    let mut output_text = text.to_string();
+    for str in toreplace {
+        output_text = output_text.replace(&format!(":{}:", str), ids[i]);
+        i += 1;
+    }
+    //print!("REPLACED TEXT:{}", output_text);
+    output_text
 }
 
 // fg:100 bg:200 b:0 eff:i
@@ -39,8 +61,7 @@ pub fn text(usertext: &str, format: &str) -> String {
 
     let escape = "\x1b";
     let end_seq = "\x1b[0m";
-    let mut all_effects = String::from("");
-    let ansi_codes = colors::ansi_color_codes();
+    let mut all_effects: String = Default::default();
 
     let parts: Vec<&str> = format.split_whitespace().collect();
     for part in parts {
@@ -56,10 +77,8 @@ pub fn text(usertext: &str, format: &str) -> String {
                 let rgb_formatted = format!("{}[38;2;{};{};{}m", escape, rgb[0], rgb[1], rgb[2]);
                 all_effects.push_str(&rgb_formatted);
             } else {
-                let fg_code = ansi_codes
-                    .get(&val)
-                    .expect("Cannot find color name")
-                    .to_string();
+                let fg_code = find_color(val).to_string();
+
                 let fg_formatted = format!("{}[38;5;{}m", escape, fg_code);
                 all_effects.push_str(&fg_formatted);
             }
@@ -71,10 +90,7 @@ pub fn text(usertext: &str, format: &str) -> String {
                 let rgb_formatted = format!("{}[48;2;{};{};{}m", escape, rgb[0], rgb[1], rgb[2]);
                 all_effects.push_str(&rgb_formatted);
             } else {
-                let bg_code = ansi_codes
-                    .get(&val)
-                    .expect("Cannot find color name")
-                    .to_string();
+                let bg_code = find_color(val).to_string();
                 let bg_formatted = format!("{}[48;5;{}m", escape, bg_code);
                 all_effects.push_str(&bg_formatted);
             }

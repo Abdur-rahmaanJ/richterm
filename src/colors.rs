@@ -1,467 +1,417 @@
-use std::collections::HashMap;
+use convert_case::{Case, Casing};
+use std::str::FromStr;
+use strum::EnumString;
 
-pub fn ansi_color_codes() -> HashMap<&'static str, i32> {
-    let ansi_codes = HashMap::from([
-        ("black", 0),
-        ("red", 1),
-        ("green", 2),
-        ("yellow", 3),
-        ("blue", 4),
-        ("magenta", 5),
-        ("cyan", 6),
-        ("white", 7),
-        ("bright_black", 8),
-        ("bright_red", 9),
-        ("bright_green", 10),
-        ("bright_yellow", 11),
-        ("bright_blue", 12),
-        ("bright_magenta", 13),
-        ("bright_cyan", 14),
-        ("bright_white", 15),
-        ("grey0", 16),
-        ("gray0", 16),
-        ("navy_blue", 17),
-        ("dark_blue", 18),
-        ("blue3", 20),
-        ("blue1", 21),
-        ("dark_green", 22),
-        ("deep_sky_blue4", 25),
-        ("dodger_blue3", 26),
-        ("dodger_blue2", 27),
-        ("green4", 28),
-        ("spring_green4", 29),
-        ("turquoise4", 30),
-        ("deep_sky_blue3", 32),
-        ("dodger_blue1", 33),
-        ("green3", 40),
-        ("spring_green3", 41),
-        ("dark_cyan", 36),
-        ("light_sea_green", 37),
-        ("deep_sky_blue2", 38),
-        ("deep_sky_blue1", 39),
-        ("spring_green2", 47),
-        ("cyan3", 43),
-        ("dark_turquoise", 44),
-        ("turquoise2", 45),
-        ("green1", 46),
-        ("spring_green1", 48),
-        ("medium_spring_green", 49),
-        ("cyan2", 50),
-        ("cyan1", 51),
-        ("dark_red", 88),
-        ("deep_pink4", 125),
-        ("purple4", 55),
-        ("purple3", 56),
-        ("blue_violet", 57),
-        ("orange4", 94),
-        ("grey37", 59),
-        ("gray37", 59),
-        ("medium_purple4", 60),
-        ("slate_blue3", 62),
-        ("royal_blue1", 63),
-        ("chartreuse4", 64),
-        ("dark_sea_green4", 71),
-        ("pale_turquoise4", 66),
-        ("steel_blue", 67),
-        ("steel_blue3", 68),
-        ("cornflower_blue", 69),
-        ("chartreuse3", 76),
-        ("cadet_blue", 73),
-        ("sky_blue3", 74),
-        ("steel_blue1", 81),
-        ("pale_green3", 114),
-        ("sea_green3", 78),
-        ("aquamarine3", 79),
-        ("medium_turquoise", 80),
-        ("chartreuse2", 112),
-        ("sea_green2", 83),
-        ("sea_green1", 85),
-        ("aquamarine1", 122),
-        ("dark_slate_gray2", 87),
-        ("dark_magenta", 91),
-        ("dark_violet", 128),
-        ("purple", 129),
-        ("light_pink4", 95),
-        ("plum4", 96),
-        ("medium_purple3", 98),
-        ("slate_blue1", 99),
-        ("yellow4", 106),
-        ("wheat4", 101),
-        ("grey53", 102),
-        ("gray53", 102),
-        ("light_slate_grey", 103),
-        ("light_slate_gray", 103),
-        ("medium_purple", 104),
-        ("light_slate_blue", 105),
-        ("dark_olive_green3", 149),
-        ("dark_sea_green", 108),
-        ("light_sky_blue3", 110),
-        ("sky_blue2", 111),
-        ("dark_sea_green3", 150),
-        ("dark_slate_gray3", 116),
-        ("sky_blue1", 117),
-        ("chartreuse1", 118),
-        ("light_green", 120),
-        ("pale_green1", 156),
-        ("dark_slate_gray1", 123),
-        ("red3", 160),
-        ("medium_violet_red", 126),
-        ("magenta3", 164),
-        ("dark_orange3", 166),
-        ("indian_red", 167),
-        ("hot_pink3", 168),
-        ("medium_orchid3", 133),
-        ("medium_orchid", 134),
-        ("medium_purple2", 140),
-        ("dark_goldenrod", 136),
-        ("light_salmon3", 173),
-        ("rosy_brown", 138),
-        ("grey63", 139),
-        ("gray63", 139),
-        ("medium_purple1", 141),
-        ("gold3", 178),
-        ("dark_khaki", 143),
-        ("navajo_white3", 144),
-        ("grey69", 145),
-        ("gray69", 145),
-        ("light_steel_blue3", 146),
-        ("light_steel_blue", 147),
-        ("yellow3", 184),
-        ("dark_sea_green2", 157),
-        ("light_cyan3", 152),
-        ("light_sky_blue1", 153),
-        ("green_yellow", 154),
-        ("dark_olive_green2", 155),
-        ("dark_sea_green1", 193),
-        ("pale_turquoise1", 159),
-        ("deep_pink3", 162),
-        ("magenta2", 200),
-        ("hot_pink2", 169),
-        ("orchid", 170),
-        ("medium_orchid1", 207),
-        ("orange3", 172),
-        ("light_pink3", 174),
-        ("pink3", 175),
-        ("plum3", 176),
-        ("violet", 177),
-        ("light_goldenrod3", 179),
-        ("tan", 180),
-        ("misty_rose3", 181),
-        ("thistle3", 182),
-        ("plum2", 183),
-        ("khaki3", 185),
-        ("light_goldenrod2", 222),
-        ("light_yellow3", 187),
-        ("grey84", 188),
-        ("gray84", 188),
-        ("light_steel_blue1", 189),
-        ("yellow2", 190),
-        ("dark_olive_green1", 192),
-        ("honeydew2", 194),
-        ("light_cyan1", 195),
-        ("red1", 196),
-        ("deep_pink2", 197),
-        ("deep_pink1", 199),
-        ("magenta1", 201),
-        ("orange_red1", 202),
-        ("indian_red1", 204),
-        ("hot_pink", 206),
-        ("dark_orange", 208),
-        ("salmon1", 209),
-        ("light_coral", 210),
-        ("pale_violet_red1", 211),
-        ("orchid2", 212),
-        ("orchid1", 213),
-        ("orange1", 214),
-        ("sandy_brown", 215),
-        ("light_salmon1", 216),
-        ("light_pink1", 217),
-        ("pink1", 218),
-        ("plum1", 219),
-        ("gold1", 220),
-        ("navajo_white1", 223),
-        ("misty_rose1", 224),
-        ("thistle1", 225),
-        ("yellow1", 226),
-        ("light_goldenrod1", 227),
-        ("khaki1", 228),
-        ("wheat1", 229),
-        ("cornsilk1", 230),
-        ("grey100", 231),
-        ("gray100", 231),
-        ("grey3", 232),
-        ("gray3", 232),
-        ("grey7", 233),
-        ("gray7", 233),
-        ("grey11", 234),
-        ("gray11", 234),
-        ("grey15", 235),
-        ("gray15", 235),
-        ("grey19", 236),
-        ("gray19", 236),
-        ("grey23", 237),
-        ("gray23", 237),
-        ("grey27", 238),
-        ("gray27", 238),
-        ("grey30", 239),
-        ("gray30", 239),
-        ("grey35", 240),
-        ("gray35", 240),
-        ("grey39", 241),
-        ("gray39", 241),
-        ("grey42", 242),
-        ("gray42", 242),
-        ("grey46", 243),
-        ("gray46", 243),
-        ("grey50", 244),
-        ("gray50", 244),
-        ("grey54", 245),
-        ("gray54", 245),
-        ("grey58", 246),
-        ("gray58", 246),
-        ("grey62", 247),
-        ("gray62", 247),
-        ("grey66", 248),
-        ("gray66", 248),
-        ("grey70", 249),
-        ("gray70", 249),
-        ("grey74", 250),
-        ("gray74", 250),
-        ("grey78", 251),
-        ("gray78", 251),
-        ("grey82", 252),
-        ("gray82", 252),
-        ("grey85", 253),
-        ("gray85", 253),
-        ("grey89", 254),
-        ("gray89", 254),
-        ("grey93", 255),
-        ("gray93", 255),
-    ]);
-
-    ansi_codes
-}
+#[derive(Debug, PartialEq, EnumString)]
 enum Colors {
-    black = 0,
-    red = 1,
-    green = 2,
-    yellow = 3,
-    blue = 4,
-    magenta = 5,
-    cyan = 6,
-    white = 7,
-    bright_black = 8,
-    bright_red = 9,
-    bright_green = 10,
-    bright_yellow = 11,
-    bright_blue = 12,
-    bright_magenta = 13,
-    bright_cyan = 14,
-    bright_white = 15,
-    grey0 = 16,
-    navy_blue = 17,
-    dark_blue = 18,
-    blue3 = 20,
-    blue1 = 21,
-    dark_green = 22,
-    deep_sky_blue4 = 25,
-    dodger_blue3 = 26,
-    dodger_blue2 = 27,
-    green4 = 28,
-    spring_green4 = 29,
-    turquoise4 = 30,
-    deep_sky_blue3 = 32,
-    dodger_blue1 = 33,
-    green3 = 40,
-    spring_green3 = 41,
-    dark_cyan = 36,
-    light_sea_green = 37,
-    deep_sky_blue2 = 38,
-    deep_sky_blue1 = 39,
-    spring_green2 = 47,
-    cyan3 = 43,
-    dark_turquoise = 44,
-    turquoise2 = 45,
-    green1 = 46,
-    spring_green1 = 48,
-    medium_spring_green = 49,
-    cyan2 = 50,
-    cyan1 = 51,
-    dark_red = 88,
-    deep_pink4 = 125,
-    purple4 = 55,
-    purple3 = 56,
-    blue_violet = 57,
-    orange4 = 94,
-    grey37 = 59,
-    medium_purple4 = 60,
-    slate_blue3 = 62,
-    royal_blue1 = 63,
-    chartreuse4 = 64,
-    dark_sea_green4 = 71,
-    pale_turquoise4 = 66,
-    steel_blue = 67,
-    steel_blue3 = 68,
-    cornflower_blue = 69,
-    chartreuse3 = 76,
-    cadet_blue = 73,
-    sky_blue3 = 74,
-    steel_blue1 = 81,
-    pale_green3 = 114,
-    sea_green3 = 78,
-    aquamarine3 = 79,
-    medium_turquoise = 80,
-    chartreuse2 = 112,
-    sea_green2 = 83,
-    sea_green1 = 85,
-    aquamarine1 = 122,
-    dark_slate_gray2 = 87,
-    dark_magenta = 91,
-    dark_violet = 128,
-    purple = 129,
-    light_pink4 = 95,
-    plum4 = 96,
-    medium_purple3 = 98,
-    slate_blue1 = 99,
-    yellow4 = 106,
-    wheat4 = 101,
-    grey53 = 102,
-    light_slate_grey = 103,
-    medium_purple = 104,
-    light_slate_blue = 105,
-    dark_olive_green3 = 149,
-    dark_sea_green = 108,
-    light_sky_blue3 = 110,
-    sky_blue2 = 111,
-    dark_sea_green3 = 150,
-    dark_slate_gray3 = 116,
-    sky_blue1 = 117,
-    chartreuse1 = 118,
-    light_green = 120,
-    pale_green1 = 156,
-    dark_slate_gray1 = 123,
-    red3 = 160,
-    medium_violet_red = 126,
-    magenta3 = 164,
-    dark_orange3 = 166,
-    indian_red = 167,
-    hot_pink3 = 168,
-    medium_orchid3 = 133,
-    medium_orchid = 134,
-    medium_purple2 = 140,
-    dark_goldenrod = 136,
-    light_salmon3 = 173,
-    rosy_brown = 138,
-    grey63 = 139,
-    medium_purple1 = 141,
-    gold3 = 178,
-    dark_khaki = 143,
-    navajo_white3 = 144,
-    grey69 = 145,
-    light_steel_blue3 = 146,
-    light_steel_blue = 147,
-    yellow3 = 184,
-    dark_sea_green2 = 157,
-    light_cyan3 = 152,
-    light_sky_blue1 = 153,
-    green_yellow = 154,
-    dark_olive_green2 = 155,
-    dark_sea_green1 = 193,
-    pale_turquoise1 = 159,
-    deep_pink3 = 162,
-    magenta2 = 200,
-    hot_pink2 = 169,
-    orchid = 170,
-    medium_orchid1 = 207,
-    orange3 = 172,
-    light_pink3 = 174,
-    pink3 = 175,
-    plum3 = 176,
-    violet = 177,
-    light_goldenrod3 = 179,
-    tan = 180,
-    misty_rose3 = 181,
-    thistle3 = 182,
-    plum2 = 183,
-    khaki3 = 185,
-    light_goldenrod2 = 222,
-    light_yellow3 = 187,
-    grey84 = 188,
-    light_steel_blue1 = 189,
-    yellow2 = 190,
-    dark_olive_green1 = 192,
-    honeydew2 = 194,
-    light_cyan1 = 195,
-    red1 = 196,
-    deep_pink2 = 197,
-    deep_pink1 = 199,
-    magenta1 = 201,
-    orange_red1 = 202,
-    indian_red1 = 204,
-    hot_pink = 206,
-    dark_orange = 208,
-    salmon1 = 209,
-    light_coral = 210,
-    pale_violet_red1 = 211,
-    orchid2 = 212,
-    orchid1 = 213,
-    orange1 = 214,
-    sandy_brown = 215,
-    light_salmon1 = 216,
-    light_pink1 = 217,
-    pink1 = 218,
-    plum1 = 219,
-    gold1 = 220,
-    navajo_white1 = 223,
-    misty_rose1 = 224,
-    thistle1 = 225,
-    yellow1 = 226,
-    light_goldenrod1 = 227,
-    khaki1 = 228,
-    wheat1 = 229,
-    cornsilk1 = 230,
-    grey100 = 231,
-    grey3 = 232,
-    grey7 = 233,
-    grey11 = 234,
-    grey15 = 235,
-
-    grey19 = 236,
-
-    grey23 = 237,
-
-    grey27 = 238,
-
-    grey30 = 239,
-
-    grey35 = 240,
-
-    grey39 = 241,
-
-    grey42 = 242,
-
-    grey46 = 243,
-
-    grey50 = 244,
-
-    grey54 = 245,
-
-    gray58 = 246,
-
-    gray62 = 247,
-
-    gray66 = 248,
-
-    gray70 = 249,
-
-    gray74 = 250,
-
-    gray78 = 251,
-
-    gray82 = 252,
-
-    gray85 = 253,
-
-    gray89 = 254,
-    gray93 = 255,
+    #[strum(ascii_case_insensitive)]
+    Black = 0,
+    #[strum(ascii_case_insensitive)]
+    Red = 1,
+    #[strum(ascii_case_insensitive)]
+    Green = 2,
+    #[strum(ascii_case_insensitive)]
+    Yellow = 3,
+    #[strum(ascii_case_insensitive)]
+    Blue = 4,
+    #[strum(ascii_case_insensitive)]
+    Magenta = 5,
+    #[strum(ascii_case_insensitive)]
+    Cyan = 6,
+    #[strum(ascii_case_insensitive)]
+    White = 7,
+    #[strum(ascii_case_insensitive)]
+    BrightBlack = 8,
+    #[strum(ascii_case_insensitive)]
+    BrightRed = 9,
+    #[strum(ascii_case_insensitive)]
+    BrightGreen = 10,
+    #[strum(ascii_case_insensitive)]
+    BrightYellow = 11,
+    #[strum(ascii_case_insensitive)]
+    BrightBlue = 12,
+    #[strum(ascii_case_insensitive)]
+    BrightMagenta = 13,
+    #[strum(ascii_case_insensitive)]
+    BrightCyan = 14,
+    #[strum(ascii_case_insensitive)]
+    BrightWhite = 15,
+    #[strum(ascii_case_insensitive)]
+    Grey0 = 16,
+    #[strum(ascii_case_insensitive)]
+    NavyBlue = 17,
+    #[strum(ascii_case_insensitive)]
+    DarkBlue = 18,
+    #[strum(ascii_case_insensitive)]
+    Blue3 = 20,
+    #[strum(ascii_case_insensitive)]
+    Blue1 = 21,
+    #[strum(ascii_case_insensitive)]
+    DarkGreen = 22,
+    #[strum(ascii_case_insensitive)]
+    DeepSkyBlue4 = 25,
+    #[strum(ascii_case_insensitive)]
+    DodgerBlue3 = 26,
+    #[strum(ascii_case_insensitive)]
+    DodgerBlue2 = 27,
+    #[strum(ascii_case_insensitive)]
+    Green4 = 28,
+    #[strum(ascii_case_insensitive)]
+    SpringGreen4 = 29,
+    #[strum(ascii_case_insensitive)]
+    Turquoise4 = 30,
+    #[strum(ascii_case_insensitive)]
+    DeepSkyBlue3 = 32,
+    #[strum(ascii_case_insensitive)]
+    DodgerBlue1 = 33,
+    #[strum(ascii_case_insensitive)]
+    Green3 = 40,
+    #[strum(ascii_case_insensitive)]
+    SpringGreen3 = 41,
+    #[strum(ascii_case_insensitive)]
+    DarkCyan = 36,
+    #[strum(ascii_case_insensitive)]
+    LightSeaGreen = 37,
+    #[strum(ascii_case_insensitive)]
+    DeepSkyBlue2 = 38,
+    #[strum(ascii_case_insensitive)]
+    DeepSkyBlue1 = 39,
+    #[strum(ascii_case_insensitive)]
+    SpringGreen2 = 47,
+    #[strum(ascii_case_insensitive)]
+    Cyan3 = 43,
+    #[strum(ascii_case_insensitive)]
+    DarkTurquoise = 44,
+    #[strum(ascii_case_insensitive)]
+    Turquoise2 = 45,
+    #[strum(ascii_case_insensitive)]
+    Green1 = 46,
+    #[strum(ascii_case_insensitive)]
+    SpringGreen1 = 48,
+    #[strum(ascii_case_insensitive)]
+    MediumSpringGreen = 49,
+    #[strum(ascii_case_insensitive)]
+    Cyan2 = 50,
+    #[strum(ascii_case_insensitive)]
+    Cyan1 = 51,
+    #[strum(ascii_case_insensitive)]
+    DarkRed = 88,
+    #[strum(ascii_case_insensitive)]
+    DeepPink4 = 125,
+    #[strum(ascii_case_insensitive)]
+    Purple4 = 55,
+    #[strum(ascii_case_insensitive)]
+    Purple3 = 56,
+    #[strum(ascii_case_insensitive)]
+    BlueViolet = 57,
+    #[strum(ascii_case_insensitive)]
+    Orange4 = 94,
+    #[strum(ascii_case_insensitive)]
+    Grey37 = 59,
+    #[strum(ascii_case_insensitive)]
+    MediumPurple4 = 60,
+    #[strum(ascii_case_insensitive)]
+    SlateBlue3 = 62,
+    #[strum(ascii_case_insensitive)]
+    RoyalBlue1 = 63,
+    #[strum(ascii_case_insensitive)]
+    Chartreuse4 = 64,
+    #[strum(ascii_case_insensitive)]
+    DarkSeaGreen4 = 71,
+    #[strum(ascii_case_insensitive)]
+    PaleTurquoise4 = 66,
+    #[strum(ascii_case_insensitive)]
+    SteelBlue = 67,
+    #[strum(ascii_case_insensitive)]
+    SteelBlue3 = 68,
+    #[strum(ascii_case_insensitive)]
+    CornflowerBlue = 69,
+    #[strum(ascii_case_insensitive)]
+    Chartreuse3 = 76,
+    #[strum(ascii_case_insensitive)]
+    CadetBlue = 73,
+    #[strum(ascii_case_insensitive)]
+    SkyBlue3 = 74,
+    #[strum(ascii_case_insensitive)]
+    SteelBlue1 = 81,
+    #[strum(ascii_case_insensitive)]
+    PaleGreen3 = 114,
+    #[strum(ascii_case_insensitive)]
+    SeaGreen3 = 78,
+    #[strum(ascii_case_insensitive)]
+    Aquamarine3 = 79,
+    #[strum(ascii_case_insensitive)]
+    MediumTurquoise = 80,
+    #[strum(ascii_case_insensitive)]
+    Chartreuse2 = 112,
+    #[strum(ascii_case_insensitive)]
+    SeaGreen2 = 83,
+    #[strum(ascii_case_insensitive)]
+    SeaGreen1 = 85,
+    #[strum(ascii_case_insensitive)]
+    Aquamarine1 = 122,
+    #[strum(ascii_case_insensitive)]
+    DarkSlateGray2 = 87,
+    #[strum(ascii_case_insensitive)]
+    DarkMagenta = 91,
+    #[strum(ascii_case_insensitive)]
+    DarkViolet = 128,
+    #[strum(ascii_case_insensitive)]
+    Purple = 129,
+    #[strum(ascii_case_insensitive)]
+    LightPink4 = 95,
+    #[strum(ascii_case_insensitive)]
+    Plum4 = 96,
+    #[strum(ascii_case_insensitive)]
+    MediumPurple3 = 98,
+    #[strum(ascii_case_insensitive)]
+    SlateBlue1 = 99,
+    #[strum(ascii_case_insensitive)]
+    Yellow4 = 106,
+    #[strum(ascii_case_insensitive)]
+    Wheat4 = 101,
+    #[strum(ascii_case_insensitive)]
+    Grey53 = 102,
+    #[strum(ascii_case_insensitive)]
+    LightSlateGrey = 103,
+    #[strum(ascii_case_insensitive)]
+    MediumPurple = 104,
+    #[strum(ascii_case_insensitive)]
+    LightSlateBlue = 105,
+    #[strum(ascii_case_insensitive)]
+    DarkOliveGreen3 = 149,
+    #[strum(ascii_case_insensitive)]
+    DarkSeaGreen = 108,
+    #[strum(ascii_case_insensitive)]
+    LightSkyBlue3 = 110,
+    #[strum(ascii_case_insensitive)]
+    SkyBlue2 = 111,
+    #[strum(ascii_case_insensitive)]
+    DarkSeaGreen3 = 150,
+    #[strum(ascii_case_insensitive)]
+    DarkSlateGray3 = 116,
+    #[strum(ascii_case_insensitive)]
+    SkyBlue1 = 117,
+    #[strum(ascii_case_insensitive)]
+    Chartreuse1 = 118,
+    #[strum(ascii_case_insensitive)]
+    LightGreen = 120,
+    #[strum(ascii_case_insensitive)]
+    PaleGreen1 = 156,
+    #[strum(ascii_case_insensitive)]
+    DarkSlateGray1 = 123,
+    #[strum(ascii_case_insensitive)]
+    Red3 = 160,
+    #[strum(ascii_case_insensitive)]
+    MediumVioletRed = 126,
+    #[strum(ascii_case_insensitive)]
+    Magenta3 = 164,
+    #[strum(ascii_case_insensitive)]
+    DarkOrange3 = 166,
+    #[strum(ascii_case_insensitive)]
+    IndianRed = 167,
+    #[strum(ascii_case_insensitive)]
+    HotPink3 = 168,
+    #[strum(ascii_case_insensitive)]
+    MediumOrchid3 = 133,
+    #[strum(ascii_case_insensitive)]
+    MediumOrchid = 134,
+    #[strum(ascii_case_insensitive)]
+    MediumPurple2 = 140,
+    #[strum(ascii_case_insensitive)]
+    DarkGoldenrod = 136,
+    #[strum(ascii_case_insensitive)]
+    LightSalmon3 = 173,
+    #[strum(ascii_case_insensitive)]
+    RosyBrown = 138,
+    #[strum(ascii_case_insensitive)]
+    Grey63 = 139,
+    #[strum(ascii_case_insensitive)]
+    MediumPurple1 = 141,
+    #[strum(ascii_case_insensitive)]
+    Gold3 = 178,
+    #[strum(ascii_case_insensitive)]
+    DarkKhaki = 143,
+    #[strum(ascii_case_insensitive)]
+    NavajoWhite3 = 144,
+    #[strum(ascii_case_insensitive)]
+    Grey69 = 145,
+    #[strum(ascii_case_insensitive)]
+    LightSteelBlue3 = 146,
+    #[strum(ascii_case_insensitive)]
+    LightSteelBlue = 147,
+    #[strum(ascii_case_insensitive)]
+    Yellow3 = 184,
+    #[strum(ascii_case_insensitive)]
+    DarkSeaGreen2 = 157,
+    #[strum(ascii_case_insensitive)]
+    LightCyan3 = 152,
+    #[strum(ascii_case_insensitive)]
+    LightSkyBlue1 = 153,
+    #[strum(ascii_case_insensitive)]
+    GreenYellow = 154,
+    #[strum(ascii_case_insensitive)]
+    DarkOliveGreen2 = 155,
+    #[strum(ascii_case_insensitive)]
+    DarkSeaGreen1 = 193,
+    #[strum(ascii_case_insensitive)]
+    PaleTurquoise1 = 159,
+    #[strum(ascii_case_insensitive)]
+    DeepPink3 = 162,
+    #[strum(ascii_case_insensitive)]
+    Magenta2 = 200,
+    #[strum(ascii_case_insensitive)]
+    HotPink2 = 169,
+    #[strum(ascii_case_insensitive)]
+    Orchid = 170,
+    #[strum(ascii_case_insensitive)]
+    MediumOrchid1 = 207,
+    #[strum(ascii_case_insensitive)]
+    Orange3 = 172,
+    #[strum(ascii_case_insensitive)]
+    LightPink3 = 174,
+    #[strum(ascii_case_insensitive)]
+    Pink3 = 175,
+    #[strum(ascii_case_insensitive)]
+    Plum3 = 176,
+    #[strum(ascii_case_insensitive)]
+    Violet = 177,
+    #[strum(ascii_case_insensitive)]
+    LightGoldenrod3 = 179,
+    #[strum(ascii_case_insensitive)]
+    Tan = 180,
+    #[strum(ascii_case_insensitive)]
+    MistyRose3 = 181,
+    #[strum(ascii_case_insensitive)]
+    Thistle3 = 182,
+    #[strum(ascii_case_insensitive)]
+    Plum2 = 183,
+    #[strum(ascii_case_insensitive)]
+    Khaki3 = 185,
+    #[strum(ascii_case_insensitive)]
+    LightGoldenrod2 = 222,
+    #[strum(ascii_case_insensitive)]
+    LightYellow3 = 187,
+    #[strum(ascii_case_insensitive)]
+    Grey84 = 188,
+    #[strum(ascii_case_insensitive)]
+    LightSteelBlue1 = 189,
+    #[strum(ascii_case_insensitive)]
+    Yellow2 = 190,
+    #[strum(ascii_case_insensitive)]
+    DarkOliveGreen1 = 192,
+    #[strum(ascii_case_insensitive)]
+    Honeydew2 = 194,
+    #[strum(ascii_case_insensitive)]
+    LightCyan1 = 195,
+    #[strum(ascii_case_insensitive)]
+    Red1 = 196,
+    #[strum(ascii_case_insensitive)]
+    DeepPink2 = 197,
+    #[strum(ascii_case_insensitive)]
+    DeepPink1 = 199,
+    #[strum(ascii_case_insensitive)]
+    Magenta1 = 201,
+    #[strum(ascii_case_insensitive)]
+    OrangeRed1 = 202,
+    #[strum(ascii_case_insensitive)]
+    IndianRed1 = 204,
+    #[strum(ascii_case_insensitive)]
+    HotPink = 206,
+    #[strum(ascii_case_insensitive)]
+    DarkOrange = 208,
+    #[strum(ascii_case_insensitive)]
+    Salmon1 = 209,
+    #[strum(ascii_case_insensitive)]
+    LightCoral = 210,
+    #[strum(ascii_case_insensitive)]
+    PaleVioletRed1 = 211,
+    #[strum(ascii_case_insensitive)]
+    Orchid2 = 212,
+    #[strum(ascii_case_insensitive)]
+    Orchid1 = 213,
+    #[strum(ascii_case_insensitive)]
+    Orange1 = 214,
+    #[strum(ascii_case_insensitive)]
+    SandyBrown = 215,
+    #[strum(ascii_case_insensitive)]
+    LightSalmon1 = 216,
+    #[strum(ascii_case_insensitive)]
+    LightPink1 = 217,
+    #[strum(ascii_case_insensitive)]
+    Pink1 = 218,
+    #[strum(ascii_case_insensitive)]
+    Plum1 = 219,
+    #[strum(ascii_case_insensitive)]
+    Gold1 = 220,
+    #[strum(ascii_case_insensitive)]
+    NavajoWhite1 = 223,
+    #[strum(ascii_case_insensitive)]
+    MistyRose1 = 224,
+    #[strum(ascii_case_insensitive)]
+    Thistle1 = 225,
+    #[strum(ascii_case_insensitive)]
+    Yellow1 = 226,
+    #[strum(ascii_case_insensitive)]
+    LightGoldenrod1 = 227,
+    #[strum(ascii_case_insensitive)]
+    Khaki1 = 228,
+    #[strum(ascii_case_insensitive)]
+    Wheat1 = 229,
+    #[strum(ascii_case_insensitive)]
+    Cornsilk1 = 230,
+    #[strum(ascii_case_insensitive)]
+    Grey100 = 231,
+    #[strum(ascii_case_insensitive)]
+    Grey3 = 232,
+    #[strum(ascii_case_insensitive)]
+    Grey7 = 233,
+    #[strum(ascii_case_insensitive)]
+    Grey11 = 234,
+    #[strum(ascii_case_insensitive)]
+    Grey15 = 235,
+    #[strum(ascii_case_insensitive)]
+    Grey19 = 236,
+    #[strum(ascii_case_insensitive)]
+    Grey23 = 237,
+    #[strum(ascii_case_insensitive)]
+    Grey27 = 238,
+    #[strum(ascii_case_insensitive)]
+    Grey30 = 239,
+    #[strum(ascii_case_insensitive)]
+    Grey35 = 240,
+    #[strum(ascii_case_insensitive)]
+    Grey39 = 241,
+    #[strum(ascii_case_insensitive)]
+    Grey42 = 242,
+    #[strum(ascii_case_insensitive)]
+    Grey46 = 243,
+    #[strum(ascii_case_insensitive)]
+    Grey50 = 244,
+    #[strum(ascii_case_insensitive)]
+    Grey54 = 245,
+    #[strum(ascii_case_insensitive)]
+    Gray58 = 246,
+    #[strum(ascii_case_insensitive)]
+    Gray62 = 247,
+    #[strum(ascii_case_insensitive)]
+    Gray66 = 248,
+    #[strum(ascii_case_insensitive)]
+    Gray70 = 249,
+    #[strum(ascii_case_insensitive)]
+    Gray74 = 250,
+    #[strum(ascii_case_insensitive)]
+    Gray78 = 251,
+    #[strum(ascii_case_insensitive)]
+    Gray82 = 252,
+    #[strum(ascii_case_insensitive)]
+    Gray85 = 253,
+    #[strum(ascii_case_insensitive)]
+    Gray89 = 254,
+    #[strum(ascii_case_insensitive)]
+    Gray93 = 255,
+}
+pub fn find_color(color: &str) -> i32 {
+    let color_variant = Colors::from_str(color.to_case(Case::Pascal).as_str()).unwrap();
+    color_variant as i32
 }

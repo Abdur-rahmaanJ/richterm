@@ -18,3 +18,6 @@ path = "src/lib.rs"
 
 [dependencies]
 regex = "1.9.1"
+strum = { version = "0.25", features = ["derive"] }
+convert_case = "0.6.0"
+emojis = "0.6.0"
