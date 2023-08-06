@@ -1,6 +1,7 @@
 mod colors;
 mod emojis;
 mod uuid;
+mod spinners;
 use regex::escape;
 use regex::Regex;
 use std::collections::HashMap;
@@ -415,4 +416,10 @@ pub fn progress() -> Brogress {
     let p = Brogress::new();
 
     p
+}
+
+pub fn spinner(type_: &str, message: &str) -> spinners::Spinner{
+    let s = spinners::Spinner::new(type_, message);
+
+    s
 }

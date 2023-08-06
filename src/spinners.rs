@@ -5,97 +5,65 @@ use std::io::{self, Write};
 use std::sync::{Arc, Mutex};
 use std::sync::mpsc;
 
-struct Spinner {
-    frames: Vec<char>,
+
+use std::collections::HashMap;
+
+pub fn frame_data() -> HashMap<String, Vec<&'static str>> {
+    let frames = HashMap::from([
+        ("simple".to_string(), vec!["-", "/", "|", "\\"]),
+        ("moon".to_string(), vec!["🌕", "🌖", "🌘", "🌒", "🌓", "🌔"]),
+        ]);
+
+    frames
+}
+
+pub struct Spinner {
+    frames: Vec<String>,
     interval: Duration,
+    type_: String,
+    message: String,
+    finished: bool,
+    thread_handle: Option<thread::JoinHandle<()>>
 }
 
 impl Spinner {
-    fn new() -> Self {
+    pub fn new(type_: &str, message: &str) -> Self {
         Spinner {
-            frames: vec!["🌕", "🌖", "🌘", "🌒", "🌓", "🌔"],
+            frames: vec!["🌕".to_string(), "🌖".to_string(), "🌘".to_string(), "🌒".to_string(), "🌓".to_string(), "🌔".to_string()],
             interval: Duration::from_millis(100),
+            type_: type_.to_string(),
+            message: message.to_string(),
+            finished: false,
+            thread_handle: None,
         }
     }
 
-    fn start(&self, status: Arc<Mutex<Status>>, stop_rx: mpsc::Receiver<()>) {
+    pub fn start(&mut self) {
         let num_frames = self.frames.len();
         let mut current_frame = 0;
 
-        loop {
-            let status = status.lock().unwrap();
-            print!("\r{} {}", self.frames[current_frame], status.message);
-            io::stdout().flush().unwrap();
 
-            current_frame = (current_frame + 1) % num_frames;
-            thread::sleep(self.interval);
+        if !self.finished {
+            self.finished = false;
+            let handle = thread::spawn(move || {
+                while !self.finished {
+                    print!("\r{} {}", self.frames[current_frame], self.message);
+                    io::stdout().flush().unwrap();
 
-            if stop_rx.try_recv().is_ok() {
-                break;
-            }
+                    current_frame = (current_frame + 1) % num_frames;
+                    thread::sleep(self.interval);
+                }
+            });
+            self.thread_handle = Some(handle);
+        }
+        
+        
+    }
+
+    fn stop(&mut self) {
+        self.finished = true;
+        if let Some(handle) = self.thread_handle.take() {
+            handle.join().expect("Failed to join the thread.");
         }
     }
 }
-
-struct Status {
-    message: String,
-}
-
-impl Status {
-    fn new() -> Self {
-        Status {
-            message: String::new(),
-        }
-    }
-
-    fn log(&mut self, message: &str) {
-        self.message = message.to_string();
-    }
-}
-
-struct Live {
-    spinner: Arc<Mutex<Spinner>>,
-    status: Arc<Mutex<Status>>,
-}
-
-impl Live {
-    fn new() -> Self {
-        let spinner = Arc::new(Mutex::new(Spinner::new()));
-        let status = Arc::new(Mutex::new(Status::new()));
-
-        Live {
-            spinner,
-            status,
-        }
-    }
-
-    fn start(&self) {
-        let spinner = Arc::clone(&self.spinner);
-        let status = Arc::clone(&self.status);
-
-        let (tx, rx) = mpsc::channel();
-
-
-        let spinner_thread = thread::spawn(move || {
-            let spinner = spinner.lock().unwrap();
-            spinner.start(status.clone(), rx);
-        });
-
-        let status_thread = thread::spawn(move || {
-            for i in 1..=5 {
-                thread::sleep(Duration::from_secs(1));
-                let message = format!("Processing... Step {}", i);
-                let mut status = status.lock().unwrap();
-                status.log(&message);
-            }
-            tx.send(()).unwrap();
-        });
-
-        // Wait for the main task thread to finish
-        status_thread.join().unwrap();
-
-        // Wait for the spinner thread to finish
-        spinner_thread.join().unwrap();
-    }
-}
-
