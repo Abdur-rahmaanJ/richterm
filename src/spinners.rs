@@ -60,6 +60,11 @@ impl Spinner {
         
     }
 
+
+    pub fn log(&self, message: &str) {
+        println!("{}", message); // TODO: change to printer protocol
+    }
+
     fn stop(&mut self) {
         self.finished = true;
         if let Some(handle) = self.thread_handle.take() {
