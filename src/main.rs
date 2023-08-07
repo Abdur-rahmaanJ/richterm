@@ -2,6 +2,7 @@ use richterm::print;
 use richterm::text;
 use richterm::track;
 use richterm::progress;
+use richterm::spinner;
 
 use std::{thread, time};
 
@@ -47,4 +48,13 @@ fn main() {
         tasks.update(task2.clone(), 5.0);
         tasks.update(task3.clone(), 6.0);
     } 
+
+    // let somejob = spinner("moon", "doing job1");
+    // somejob.start();
+    // // somejob.log([
+    // //     text("oh oh", "")
+    // //     ]);
+    // let ten_millis = time::Duration::from_millis(5000);
+    // thread::sleep(ten_millis);
+    // somejob.stop();
 }
