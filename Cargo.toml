@@ -18,3 +18,4 @@ path = "src/lib.rs"
 
 [dependencies]
 regex = "1.9.1"
+terminal_size = "0.2.6"

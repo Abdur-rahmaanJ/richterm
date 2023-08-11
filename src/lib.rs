@@ -5,6 +5,7 @@ use regex::escape;
 use regex::Regex;
 use std::collections::HashMap;
 use std::io::{self, Write};
+use terminal_size::{Width, Height, terminal_size};
 
 pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     let slice: &[U] = data.as_ref();
@@ -399,6 +400,80 @@ impl Brogress {
 //         // Perform any necessary cleanup or resource release here
 //     }
 // }
+
+
+/*
+v1 no text colors
+    TODO: 
+    Add Text struct {
+        styles: [];
+        
+        pub get_raw(){
+            [styles, text]
+        }
+    }
+        So that textlength works well
+
+------ title -------- - 1
+| this is some text | - 2
+| not so long       | 
+---------------------
+
+* 1 - 
+    leftbarw = width - (title.len + 2) / 2
+    leftbar = char.repeat(leftbarw)
+    rightbar = char.repeat(leftbarw)
+    final = leftbarw + space + title + rightbar
+
+* 2 -
+    available_space = width - (len(pipe+space) * 2)
+    buffer = []
+    loop char over text:
+        buffer.add(char)
+        if buffer.len >= available space:
+            buffer = []
+            line = pipe + space + buffer + space + pipe
+            print(line)
+
+    if buffer.not_empty:
+        line = pipe + space + buffer + space + pipe
+        print(line)
+    
+    print(closingline)
+
+*/
+#[derive(Clone)]
+pub struct Panel {
+    text: Vec<String>,
+    title: String,
+    style: String
+}
+
+impl Panel{
+    fn new(text: Vec<String>, title: String, style: &str) -> Self {
+        Panel {
+            text,
+            title, // text()
+            style: style.to_string(),
+        }
+    }
+}
+impl std::fmt::Display for Panel {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let size = terminal_size();
+        let Some((Width(w), Height(h))) = size;
+
+        let title_len = self.title.len();
+        let bar_width = w - ((title_len + 2) / 2) as i32;
+        let bar = "-"::repeat(bar_width);
+
+        print(
+            format!("{} {} {}", bar, self.title, bar)
+            )
+        
+
+    }
+}
 
 pub fn track(steps: i32, description: &str) -> MyRange {
     // Downloading ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 100% 0:00:21
