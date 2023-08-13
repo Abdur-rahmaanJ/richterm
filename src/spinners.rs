@@ -2,8 +2,8 @@
 use std::thread;
 use std::time::Duration;
 use std::io::{self, Write};
-use std::sync::{Arc, Mutex};
-use std::sync::mpsc;
+// use std::sync::{Arc, Mutex};
+// use std::sync::mpsc;
 
 
 use std::collections::HashMap;
@@ -38,7 +38,7 @@ impl Spinner {
         }
     }
 
-    pub fn start(&mut self) {
+    pub fn start(mut self) {
         let num_frames = self.frames.len();
         let mut current_frame = 0;
 

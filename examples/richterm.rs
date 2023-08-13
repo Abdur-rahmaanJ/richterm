@@ -2,7 +2,7 @@ use richterm::print;
 use richterm::text;
 use richterm::track;
 use richterm::progress;
-use richterm::spinner;
+// use richterm::spinner;
 
 use std::{thread, time};
 
