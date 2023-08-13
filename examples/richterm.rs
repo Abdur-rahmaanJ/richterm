@@ -3,6 +3,7 @@ use richterm::text;
 use richterm::track;
 use richterm::progress;
 use richterm::spinner;
+use richterm::{spinner, print, progress};
 
 use std::{thread, time};
 
