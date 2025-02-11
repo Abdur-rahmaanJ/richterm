@@ -13,8 +13,8 @@ pub fn print<T: AsRef<[U]>, U: std::fmt::Debug + std::fmt::Display>(data: T) {
     for item in slice {
         // Process the elements here
         print!("{}", item);
-        io::stdout().flush().unwrap();
     }
+    io::stdout().flush().unwrap();
 }
 
 // Function to replace emoji shortcodes in a given text
